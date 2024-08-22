@@ -1,37 +1,67 @@
-let mid = document.getElementsByClassName("mid");
+let mid = document.getElementsByClassName("mid")[0];
+let angle = 0;
+let angularVelocity = 40;
+let interval;
+let isStarted = false;
 
-window.addEventListener("deviceorientation", e => {
-    let alpha = e.alpha; // Z軸の回転 (0〜360)
-    let beta = e.beta;   // X軸の回転 (-180〜180)
-    let gamma = e.gamma; // Y軸の回転 (-90〜90)
+window.addEventListener("load", () => {
+    const t = [
+        "💩",
+        "🍌",
+        "🍑",
+        "🍆",
+        "🖕",
+    ]
+    mid.innerHTML = t[Math.floor(Math.random() * 5)];
+});
 
-    // 3D回転を適用
-    mid[0].style.transform = `
-        translate(-50%, -50%)
-        rotateZ(${alpha}deg)
-        rotateX(${90 - beta}deg)
-        rotateY(${gamma}deg)
-    `;
-}, false)
+window.addEventListener("click", e => {
+    touch(e.screenX, e.screenY);
+});
 
+window.addEventListener("touchstart", e => {
+    touch(e.touches[0].screenX, e.touches[0].screenY);
+});
 
+function touch(x, y)
+{
+    if (x > 0 && x < window.screen.width / 2) {
+        angularVelocity += 40;
+        if (!interval){
+            interval = setInterval(() => {
+                angle += angularVelocity;
+                mid.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+    
+                // 徐々に角速度を下げる
+                angularVelocity *= 0.95;
+    
+                // 角速度が小さくなったら停止
+                if (Math.abs(angularVelocity) < 0.1) {
+                    clearInterval(interval);
+                    interval = null;
+                }
+            }, 16); // 約60FPSで回転
 
-function eulerToQuaternion(alpha, beta, gamma) {
-    let alphaRad = alpha * Math.PI / 180;
-    let betaRad = beta * Math.PI / 180;
-    let gammaRad = gamma * Math.PI / 180;
+        }
+    }
+    else
+    if (x > window.screen.width / 2 && x < window.screen.width) {
+        angularVelocity -= 40;
+        if (!interval){
+            interval = setInterval(() => {
+                angle += angularVelocity;
+                mid.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+    
+                // 徐々に角速度を下げる
+                angularVelocity *= 0.95;
+    
+                // 角速度が小さくなったら停止
+                if (Math.abs(angularVelocity) < 0.1) {
+                    clearInterval(interval);
+                    interval = null;
+                }
+            }, 16); // 約60FPSで回転
 
-    let cX = Math.cos(betaRad / 2);
-    let cY = Math.cos(gammaRad / 2);
-    let cZ = Math.cos(alphaRad / 2);
-    let sX = Math.sin(betaRad / 2);
-    let sY = Math.sin(gammaRad / 2);
-    let sZ = Math.sin(alphaRad / 2);
-
-    let w = cX * cY * cZ + sX * sY * sZ;
-    let x = sX * cY * cZ - cX * sY * sZ;
-    let y = cX * sY * cZ + sX * cY * sZ;
-    let z = cX * cY * sZ - sX * sY * cZ;
-
-    return { w: w, x: x, y: y, z: z };
+        }
+    }
 }
