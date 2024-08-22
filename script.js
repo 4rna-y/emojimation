@@ -14,6 +14,8 @@ window.addEventListener("deviceorientation", e => {
     `;
 }, false)
 
+
+
 function eulerToQuaternion(alpha, beta, gamma) {
     let alphaRad = alpha * Math.PI / 180;
     let betaRad = beta * Math.PI / 180;
